@@ -1,0 +1,55 @@
+
+
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                // Build the Docker image
+                script {
+                    docker.build("applietu:latest")
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run tests inside the Docker container
+                script {
+                    docker.run("-p 5000:5000 --name applietu-test applietu:latest python -m unittest discover")
+                }
+            }
+        }
+
+        stage('Run') {
+            steps {
+                // Run the application inside the Docker container
+                script {
+                    docker.run("-p 9000:9000 --name applietu-run -d applietu:latest")
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Stop and remove the Docker containers
+            script {
+                docker.stop("applietu-test")
+                docker.removeContainer("applietu-test")
+                docker.stop("applietu-run")
+                docker.removeContainer("applietu-run")
+            }
+
+            // Display a success or failure message
+            script {
+                def status = currentBuild.result == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'
+                echo "Build status: ${status}"
+            }
+        }
+    }
+}
