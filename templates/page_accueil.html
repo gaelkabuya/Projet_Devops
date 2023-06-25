@@ -1,12 +1,60 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Application Home Page</title>
+	<meta charset="UTF-8">
+	<title>ETUDIANT MASTER ESIS</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<h2>
-Hello World!
-</h2>
+	<h1> ETUDIANT MASTER ESIS</h1>
+	<p>Notre application affiche la liste des etudiants et des cours de complement; dans les tableaux qui va suivre se trouve: un premier tableau qui affiche la liste des etudiants, il recupere les donnees Json present dans notre application et les affiche dans un tableau. </p>
+	<table>
+		<tr>
+			<th>ID</th>
+			<th>Prenom</th>
+			<th>Nom</th>
+			<th>Postnom</th>
+			<th>Age</th>
+			<th>Promotion</th>
+			<th>Genre</th>
+		</tr>
+		{% for etudiant in etudiants %}
+		<tr>
+			<td>{{ etudiant['id'] }}</td>
+			<td>{{ etudiant['PRENOM'] }}</td>
+			<td>{{ etudiant['NOM'] }}</td>
+			<td>{{ etudiant['POSTNOM'] }}</td>
+			<td>{{ etudiant['age'] }}</td>
+			<td>{{ etudiant['Promotion'] }}</td>
+			<td>{{ etudiant['genre'] }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<h1> COURS MASTER ESIS</h1>
+	<p>Ce deuxieme tableau recupere les donnees Json present dans notre application et les affiche, il s'agit des données en rapport avec les cours. </p>
+	<table>
+		<tr>
+			<th>ID</th>
+			<th>Nom</th>
+			<th>Volume H</th>
+			<th>Credit</th>
+			<th>Titulaire</th>
+			<th>Promotion</th>
+			<th>Id_Etudiant</th>
+		</tr>
+		{% for cour in cours %}
+		<tr>
+			<td>{{ cour['id'] }}</td>
+			<td>{{ cour['NOM'] }}</td>
+			<td>{{ cour['Vol_Horaire'] }}</td>
+			<td>{{ cour['credit'] }}</td>
+			<td>{{ cour['Titulaire'] }}</td>
+			<td>{{ cour['Promotion'] }}</td>
+			<td>{{ cour['etudiant_id'] }}</td>
+		</tr>
+		{% endfor %}
+	</table>
 </body>
 </html>

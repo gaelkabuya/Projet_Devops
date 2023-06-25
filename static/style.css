@@ -1,0 +1,29 @@
+
+
+body {
+	text-align: center;
+    background-color: #D3D3D3;
+    font-family: Arial, sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+p {
+    text-align: left;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: gray;
+    color: black;
+}

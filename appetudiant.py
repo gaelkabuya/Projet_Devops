@@ -35,7 +35,7 @@ def home():
     localhost:5000/
     :return: the rendered template 'home.html'
     """
-    return render_template('page_accueil.html')
+    return render_template('page_accueil.html', etudiants=etudiants, cours=cours)
 
 # Ressource pour obtenir tous les etudiants
 @app.route('/etudiants', methods=['GET'])
