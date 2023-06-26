@@ -1,51 +1,40 @@
 
+
+
+
+
 pipeline {
     agent any
-
+    environment {
+        registry = "https://hub.docker.com/r/gaelkabuya/gael"
+        imageName = "flaskapp"
+        containerName = "contflaskapp"
+        dockerfile = "Dockerfile"
+    }
     stages {
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                // Build the Docker image
-                script {
-                    docker.build("applietu:latest")
-                }
+                sh "docker build -t ${registry}/${imageName} -f ${dockerfile} ."
             }
         }
-
-        stage('Test') {
+        stage('Push Docker Image to Registry') {
             steps {
-                // Run tests inside the Docker container
-                script {
-                    docker.run("-p 9000:9000 --name applietu-test applietu:latest python -m unittest discover")
+                withCredentials([usernamePassword(credentialsId: 'dckr_pat_gWDOdwH5pzyqsUNR5mO6QNagGoU', usernameVariable: 'gaelkabuya', passwordVariable: 'Kabuya55@55')]) {
+                    sh "docker login -u ${USERNAME} -p ${PASSWORD} ${registry}"
                 }
+                sh "docker push ${registry}/${imageName}"
             }
         }
-
-        stage('Run') {
+        stage('Run Docker Container') {
             steps {
-                // Run the application inside the Docker container
-                script {
-                    docker.run("-p 9000:9000 --name applietu-run -d applietu:latest")
-                }
+                sh "docker run -d --name ${containerName} -p 9000:9000 ${registry}/${imageName}"
             }
         }
     }
-
     post {
         always {
-            // Stop and remove the Docker containers
-            script {
-                docker.stop("applietu-test")
-                docker.removeContainer("applietu-test")
-                docker.stop("applietu-run")
-                docker.removeContainer("applietu-run")
-            }
-
-            // Display a success or failure message
-            script {
-                def status = currentBuild.result == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'
-                echo "Build status: ${status}"
-            }
+            sh "docker stop ${containerName} || true"
+            sh "docker rm ${containerName} || true"
         }
     }
 }
