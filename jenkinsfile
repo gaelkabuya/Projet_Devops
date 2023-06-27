@@ -1,14 +1,24 @@
+
 pipeline {
     agent any
-    stage('Build Docker Image') {
-  steps {
-    sh 'docker build -t monapp .'
-  }
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t monapp ."
+            }
+        }
+        stage('Run Docker Container') {
+            steps {
+                sh 'docker run -p 9000:9000 monapp'
+            }
+        }
+    }
+    post {
+        always {
+            sh "docker stop "
+            sh "docker rm "
+        }
+    }
 }
 
-stage('Run Docker Container') {
-  steps {
-    sh 'docker run -p 9000:9000 monapp'
-  }
-}
-}
+
