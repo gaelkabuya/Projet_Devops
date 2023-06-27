@@ -1,40 +1,14 @@
-
-
-
-
-
 pipeline {
     agent any
-    environment {
-        registry = "https://hub.docker.com/r/gaelkabuya/gael"
-        imageName = "flaskapp"
-        containerName = "contflaskapp"
-        dockerfile = "Dockerfile"
-    }
-    stages {
-        stage('Build Docker Image') {
-            steps {
-                sh "docker build -t ${registry}/${imageName} -f ${dockerfile} ."
-            }
-        }
-        stage('Push Docker Image to Registry') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dckr_pat_gWDOdwH5pzyqsUNR5mO6QNagGoU', usernameVariable: 'gaelkabuya', passwordVariable: 'Kabuya55@55')]) {
-                    sh "docker login -u ${USERNAME} -p ${PASSWORD} ${registry}"
-                }
-                sh "docker push ${registry}/${imageName}"
-            }
-        }
-        stage('Run Docker Container') {
-            steps {
-                sh "docker run -d --name ${containerName} -p 9000:9000 ${registry}/${imageName}"
-            }
-        }
-    }
-    post {
-        always {
-            sh "docker stop ${containerName} || true"
-            sh "docker rm ${containerName} || true"
-        }
-    }
+    stage('Build Docker Image') {
+  steps {
+    sh 'docker build -t monapp .'
+  }
+}
+
+stage('Run Docker Container') {
+  steps {
+    sh 'docker run -p 9000:9000 monapp'
+  }
+}
 }
