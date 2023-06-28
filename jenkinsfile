@@ -5,14 +5,14 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("nom-de-l-image:${env.BUILD_ID}")
+                    docker.build("Application_flask:${env.BUILD_ID}")
                 }
             }
         }
         stage('Run Docker Container') {
             steps {
                 script {
-                    docker.image("nom-de-l-image:${env.BUILD_ID}").run("-p 9000:9000 --name nom-du-conteneur")
+                    docker.image("Application_flask:${env.BUILD_ID}").run("-p 9000:9000 --name Moncontainer")
                 }
             }
         }
@@ -21,8 +21,8 @@ pipeline {
     post {
         always {
             script {
-                docker.image("nom-de-l-image:${env.BUILD_ID}").stop()
-                docker.image("nom-de-l-image:${env.BUILD_ID}").remove()
+                docker.image("Application_flask:${env.BUILD_ID}").stop()
+                docker.image("Application_flask:${env.BUILD_ID}").remove()
             }
         }
     }
