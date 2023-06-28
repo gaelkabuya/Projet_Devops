@@ -2,17 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
+                // Build the Docker image
                 script {
-                    docker.build("Application_flask:${env.BUILD_ID}")
+                    docker.build("App_flask:${env.BUILD_ID}")
                 }
             }
         }
-        stage('Run Docker Container') {
+
+        stage('Test') {
             steps {
                 script {
-                    docker.image("Application_flask:${env.BUILD_ID}").run("-p 9000:9000 --name Moncontainer")
+                    docker.run("-p 9000:9000 --name App_flask_test App_flask:latest python -m unittest discover")
+                }
+            }
+        }
+
+        stage('Run') {
+            steps {
+                // Run the application inside the Docker container
+                script {
+                    docker.run("-p 9000:9000 --name App_flask_run -d App_flask:${env.BUILD_ID}")
                 }
             }
         }
@@ -20,9 +31,18 @@ pipeline {
 
     post {
         always {
+            // Stop and remove the Docker containers
             script {
-                docker.image("Application_flask:${env.BUILD_ID}").stop()
-                docker.image("Application_flask:${env.BUILD_ID}").remove()
+                docker.stop("App_flask_test")
+                docker.removeContainer("App_flask_test")
+                docker.stop("App_flask_run")
+                docker.removeContainer("App_flask_run")
+            }
+
+            // Display a success or failure message
+            script {
+                def status = currentBuild.result == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'
+                echo "Build status: ${status}"
             }
         }
     }
