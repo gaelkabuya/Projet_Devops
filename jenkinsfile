@@ -1,19 +1,29 @@
-
 pipeline {
     agent any
+
     stages {
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t monapp .'
+                script {
+                    docker.build("nom-de-l-image:${env.BUILD_ID}")
+                }
             }
         }
         stage('Run Docker Container') {
             steps {
-                sh 'docker run -p 9000:9000 monapp'
+                script {
+                    docker.image("nom-de-l-image:${env.BUILD_ID}").run("-p 9000:9000 --name nom-du-conteneur")
+                }
             }
         }
     }
-    
+
+    post {
+        always {
+            script {
+                docker.image("nom-de-l-image:${env.BUILD_ID}").stop()
+                docker.image("nom-de-l-image:${env.BUILD_ID}").remove()
+            }
+        }
+    }
 }
-
-
